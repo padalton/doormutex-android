@@ -26,6 +26,7 @@ import net.padalton.doormutex.android.live.LiveService
 import net.padalton.doormutex.android.ui.detail.DetailScreen
 import net.padalton.doormutex.android.ui.overview.OverviewScreen
 import net.padalton.doormutex.android.ui.pairing.PairingScreen
+import net.padalton.doormutex.android.ui.settings.AboutScreen
 import net.padalton.doormutex.android.ui.settings.LicencesScreen
 import net.padalton.doormutex.android.ui.settings.SettingsScreen
 import net.padalton.doormutex.android.ui.theme.DoormutexTheme
@@ -88,6 +89,7 @@ private object Routes {
     const val OVERVIEW = "overview"
     const val SETTINGS = "settings"
     const val LICENCES = "licences"
+    const val ABOUT = "about"
     const val PROFILE = "profile/{id}"
 
     fun profile(id: String) = "profile/${android.net.Uri.encode(id)}"
@@ -165,9 +167,10 @@ private fun App(
                     replaceUrl = url
                     nav.navigate(Routes.PAIR)
                 },
-                onLicences = { nav.navigate(Routes.LICENCES) },
+                onAbout = { nav.navigate(Routes.ABOUT) },
             )
         }
+        composable(Routes.ABOUT) { AboutScreen(onBack = { nav.popBackStack() }, onLicences = { nav.navigate(Routes.LICENCES) }) }
         composable(Routes.LICENCES) { LicencesScreen(onBack = { nav.popBackStack() }) }
     }
 }

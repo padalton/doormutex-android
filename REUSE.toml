@@ -18,7 +18,7 @@ SPDX-FileCopyrightText = "Gradle Inc."
 SPDX-License-Identifier = "Apache-2.0"
 
 [[annotations]]
-path = ["app/src/main/res/drawable/ic_settings.xml", "app/src/main/res/drawable/ic_back.xml"]
+path = ["app/src/main/res/drawable/ic_settings.xml", "app/src/main/res/drawable/ic_back.xml", "app/src/main/res/drawable/ic_favorite.xml"]
 SPDX-FileCopyrightText = "Google LLC (Material Symbols)"
 SPDX-License-Identifier = "Apache-2.0"
 

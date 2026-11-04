@@ -45,7 +45,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onForgotten: () -> Unit,
     onReplace: (url: String) -> Unit,
-    onLicences: () -> Unit,
+    onAbout: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -95,7 +95,7 @@ fun SettingsScreen(
             }
             OutlinedButton(onClick = { config?.let { onReplace(it.url) } }) { Text(stringResource(R.string.settings_replace)) }
             OutlinedButton(onClick = { confirm = true }) { Text(stringResource(R.string.settings_forget)) }
-            TextButton(onClick = onLicences) { Text(stringResource(R.string.settings_licences)) }
+            TextButton(onClick = onAbout, modifier = Modifier.testTag("about-open")) { Text(stringResource(R.string.about_title)) }
             Text(
                 stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodySmall,

@@ -115,4 +115,24 @@
     <string name="settings_replace">Token ersetzen</string>
     <string name="settings_licences">Open-Source-Lizenzen</string>
     <string name="licences_title">Open-Source-Lizenzen</string>
+
+    <string name="about_title">Über doormutex</string>
+    <string name="about_dedication_title">Für Schnute</string>
+    <string name="about_dedication_text">die ich über alles liebe. Danke, dass du dem Nerd die Zeit schenkst, so etwas zu entwickeln.</string>
+    <string name="about_app">doormutex für Android</string>
+    <string name="about_tagline">Darf ich rein? Ein Blick genügt.</string>
+    <string name="about_links">Links</string>
+    <string name="about_website">Website</string>
+    <string name="about_get_started">Loslegen</string>
+    <string name="about_hardware">Die Ampel bauen</string>
+    <string name="about_source_hub">Quellcode: Hub, Firmware, Companion</string>
+    <string name="about_source_app">Quellcode: diese App</string>
+    <string name="about_issues">Problem oder Idee melden</string>
+    <string name="about_privacy">Datenschutzerklärung</string>
+    <string name="about_legal">Impressum</string>
+    <string name="about_licence">Freie Software unter der Apache License 2.0.</string>
+    <string name="url_website">https://doormutex.org/de/</string>
+    <string name="url_get_started">https://doormutex.org/de/loslegen/</string>
+    <string name="url_hardware">https://doormutex.org/de/hardware/</string>
+    <string name="url_legal">https://doormutex.org/de/impressum/</string>
 </resources>

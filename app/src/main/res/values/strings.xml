@@ -123,4 +123,24 @@
     <string name="settings_replace">Replace token</string>
     <string name="settings_licences">Open-source licences</string>
     <string name="licences_title">Open-source licences</string>
+
+    <string name="about_title">About doormutex</string>
+    <string name="about_dedication_title">For Schnute</string>
+    <string name="about_dedication_text">whom I love more than anything. Thank you for giving this nerd the time to build things like this.</string>
+    <string name="about_app">doormutex for Android</string>
+    <string name="about_tagline">Can I come in? One glance tells.</string>
+    <string name="about_links">Links</string>
+    <string name="about_website">Website</string>
+    <string name="about_get_started">Get started</string>
+    <string name="about_hardware">Build the light</string>
+    <string name="about_source_hub">Source code: hub, firmware, companion</string>
+    <string name="about_source_app">Source code: this app</string>
+    <string name="about_issues">Report a problem or an idea</string>
+    <string name="about_privacy">Privacy policy</string>
+    <string name="about_legal">Legal notice</string>
+    <string name="about_licence">Free software under the Apache License 2.0.</string>
+    <string name="url_website">https://doormutex.org/</string>
+    <string name="url_get_started">https://doormutex.org/get-started/</string>
+    <string name="url_hardware">https://doormutex.org/hardware/</string>
+    <string name="url_legal">https://doormutex.org/legal-notice/</string>
 </resources>
