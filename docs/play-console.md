@@ -27,12 +27,20 @@ Or from CI: put the four values into the repository secrets once, then push
 a tag `v<versionName>`; the *Release* workflow attaches the AAB to the run and
 publishes the APK as a GitHub pre-release.
 
+The values come from `~/.android-keys/doormutex-upload.env`, written when the
+key was created; keystore and key share one password. Nothing needs to be
+copied by hand:
+
 ```sh
-gh secret set DOORMUTEX_KEYSTORE_BASE64 < <(base64 -w0 ~/.android-keys/doormutex-upload.jks)
-gh secret set DOORMUTEX_KEYSTORE_PASSWORD   # paste from the .env file
-gh secret set DOORMUTEX_KEY_ALIAS --body upload
-gh secret set DOORMUTEX_KEY_PASSWORD        # same password
+source ~/.android-keys/doormutex-upload.env
+R=padalton/doormutex-android
+base64 -w0 "$DOORMUTEX_KEYSTORE" | gh secret set DOORMUTEX_KEYSTORE_BASE64 -R $R
+printf %s "$DOORMUTEX_KEYSTORE_PASSWORD" | gh secret set DOORMUTEX_KEYSTORE_PASSWORD -R $R
+printf %s "$DOORMUTEX_KEY_ALIAS" | gh secret set DOORMUTEX_KEY_ALIAS -R $R
+printf %s "$DOORMUTEX_KEY_PASSWORD" | gh secret set DOORMUTEX_KEY_PASSWORD -R $R
 ```
+
+The Play Console itself never asks for this password.
 
 Every upload needs a higher `versionCode` (`app/build.gradle.kts`).
 
