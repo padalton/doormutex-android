@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -22,12 +25,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,6 +47,7 @@ import net.padalton.doormutex.android.R
 import net.padalton.doormutex.android.data.HubException
 import net.padalton.doormutex.android.data.HubUrl
 import net.padalton.doormutex.android.data.PairCheck
+import net.padalton.doormutex.android.data.PairLink
 import net.padalton.doormutex.android.data.Role
 import net.padalton.doormutex.android.live.LiveService
 import net.padalton.doormutex.android.repository
@@ -77,6 +84,18 @@ class PairingViewModel(
 
     fun edited() {
         state = PairState.Editing
+    }
+
+    /**
+     * Fills in a pairing link (QR code or deep link). Returns true when it
+     * can be checked right away; plain http waits for the warning to be accepted.
+     */
+    fun use(link: PairLink): Boolean {
+        url = link.hub
+        token = link.token
+        cleartextAccepted = false
+        state = PairState.Editing
+        return (parsedUrl as? HubUrl.Ok)?.cleartext == false
     }
 
     fun check() {
@@ -118,12 +137,36 @@ class PairingViewModel(
 @Composable
 fun PairingScreen(
     onPaired: () -> Unit,
+    link: PairLink? = null,
+    initialUrl: String? = null,
+    onBack: (() -> Unit)? = null,
     vm: PairingViewModel = viewModel(),
 ) {
     val localNetwork = rememberLocalNetworkAccess()
+    var scanning by rememberSaveable { mutableStateOf(false) }
+
+    fun use(l: PairLink) {
+        scanning = false
+        if (vm.use(l)) localNetwork.request(vm::check)
+    }
+    LaunchedEffect(link) { link?.let(::use) }
+    LaunchedEffect(initialUrl) { if (initialUrl != null && vm.url.isEmpty()) vm.url = initialUrl }
     // Live mode is on by default; its notification needs the permission.
     val notifications = rememberNotificationRequest()
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.pair_title)) }) }) { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.pair_title)) },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(painterResource(R.drawable.ic_back), contentDescription = stringResource(R.string.back))
+                        }
+                    }
+                },
+            )
+        },
+    ) { padding ->
         Column(
             Modifier
                 .fillMaxSize()
@@ -133,7 +176,13 @@ fun PairingScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (scanning) {
+                QrScanner(onLink = ::use, onCancel = { scanning = false })
+                return@Column
+            }
             Text(stringResource(R.string.pair_intro), style = MaterialTheme.typography.bodyMedium)
+            Button(onClick = { scanning = true }, modifier = Modifier.testTag("pair-scan")) { Text(stringResource(R.string.pair_scan)) }
+            Text(stringResource(R.string.pair_manual), style = MaterialTheme.typography.titleSmall)
 
             val parsed = vm.parsedUrl
             val urlError =
@@ -178,8 +227,15 @@ fun PairingScreen(
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(checked = vm.cleartextAccepted, onCheckedChange = { vm.cleartextAccepted = it })
+                // The whole row toggles, not only the box.
+                Row(
+                    Modifier.toggleable(value = vm.cleartextAccepted, role = androidx.compose.ui.semantics.Role.Checkbox) {
+                        vm.cleartextAccepted =
+                            it
+                    },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Checkbox(checked = vm.cleartextAccepted, onCheckedChange = null)
                     Text(stringResource(R.string.pair_cleartext_accept))
                 }
             }

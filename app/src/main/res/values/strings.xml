@@ -41,7 +41,6 @@
 
     <!-- Pairing -->
     <string name="pair_title">Connect to your hub</string>
-    <string name="pair_intro" tools:ignore="TypographyDashes">Create a token on the hub, ideally a read-only one: doormutex-hub token create phone --read-only</string>
     <string name="pair_url">Hub address</string>
     <string name="pair_url_hint">https://doormutex.home.example</string>
     <string name="pair_token">Token</string>
@@ -100,4 +99,28 @@
 
     <string name="widget_all_name">doormutex – all lights</string>
     <string name="widget_all_description">Every light: lamp, name, status and until when</string>
+
+    <string name="pair_intro">In the hub\'s web UI, open Settings → Phones and tokens → Add a phone, then scan the QR code.</string>
+    <string name="pair_scan">Scan QR code</string>
+    <string name="pair_manual" tools:ignore="TypographyDashes">Or by hand, with a token from the hub (ideally read-only: doormutex-hub token create phone --read-only):</string>
+    <string name="scan_hint">Point the camera at the QR code in the hub\'s web UI.</string>
+    <string name="scan_no_camera">Without the camera the app cannot scan the code. Allow it in the app\'s settings, or enter address and token by hand.</string>
+    <string name="detail_planned">Next 24 hours</string>
+    <string name="detail_nothing_planned">Nothing planned.</string>
+    <string name="detail_slot">%1$s – %2$s</string>
+    <string name="detail_slot_open">from %1$s</string>
+    <string name="detail_eink">E-ink display</string>
+    <string name="detail_eink_description">What the e-ink display of %1$s shows</string>
+    <string name="detail_switch">Switch</string>
+    <string name="detail_read_only">This token may only look; switching needs a token with full access.</string>
+    <string name="detail_failed">The hub did not switch: %1$s</string>
+    <string name="detail_unreachable">The hub does not answer.</string>
+    <string name="switch_red">Red</string>
+    <string name="switch_red_hour">Red for 1 h</string>
+    <string name="switch_green">Green</string>
+    <string name="switch_off">Off</string>
+    <string name="switch_automatic">Automatic</string>
+    <string name="settings_replace">Replace token</string>
+    <string name="settings_licences">Open-source licences</string>
+    <string name="licences_title">Open-source licences</string>
 </resources>

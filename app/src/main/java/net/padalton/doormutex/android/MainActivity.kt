@@ -14,26 +14,50 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.padalton.doormutex.android.data.PairLink
 import net.padalton.doormutex.android.live.LiveService
+import net.padalton.doormutex.android.ui.detail.DetailScreen
 import net.padalton.doormutex.android.ui.overview.OverviewScreen
 import net.padalton.doormutex.android.ui.pairing.PairingScreen
+import net.padalton.doormutex.android.ui.settings.LicencesScreen
 import net.padalton.doormutex.android.ui.settings.SettingsScreen
 import net.padalton.doormutex.android.ui.theme.DoormutexTheme
 
+/** What an intent asks for: a profile (from a widget) or pairing (from a `doormutex://pair` link). */
+sealed interface Request {
+    data class Open(
+        val profile: String,
+    ) : Request
+
+    data class Pair(
+        val link: PairLink,
+    ) : Request
+
+    companion object {
+        fun of(intent: Intent?): Request? {
+            intent ?: return null
+            intent.dataString?.let(PairLink::parse)?.let { return Pair(it) }
+            return intent.getStringExtra(MainActivity.EXTRA_PROFILE)?.let(::Open)
+        }
+    }
+}
+
 class MainActivity : ComponentActivity() {
-    /** Profile to scroll to, set when a widget opened the app. */
-    private var focusProfile by mutableStateOf<String?>(null)
+    private var request by mutableStateOf<Request?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        focusProfile = intent.getStringExtra(EXTRA_PROFILE)
-        setContent { DoormutexTheme { App(focusProfile) } }
+        // Not again after a configuration change: it was handled already.
+        if (savedInstanceState == null) request = Request.of(intent)
+        setContent { DoormutexTheme { App(request) { request = null } } }
     }
 
     override fun onStart() {
@@ -44,7 +68,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        focusProfile = intent.getStringExtra(EXTRA_PROFILE)
+        request = Request.of(intent)
     }
 
     companion object {
@@ -59,33 +83,91 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Start { PAIR, OVERVIEW }
+private object Routes {
+    const val PAIR = "pair"
+    const val OVERVIEW = "overview"
+    const val SETTINGS = "settings"
+    const val LICENCES = "licences"
+    const val PROFILE = "profile/{id}"
+
+    fun profile(id: String) = "profile/${android.net.Uri.encode(id)}"
+}
 
 @Composable
-private fun App(focusProfile: String?) {
+private fun App(
+    request: Request?,
+    onHandled: () -> Unit,
+) {
     val context = LocalContext.current
     // Decided once at launch; later changes navigate explicitly.
-    var start by remember { mutableStateOf<Start?>(null) }
+    var start by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) {
-        start = if (context.repository.config.first() == null) Start.PAIR else Start.OVERVIEW
+        start = if (context.repository.config.first() == null) Routes.PAIR else Routes.OVERVIEW
     }
     val initial = start ?: return
 
     val nav = rememberNavController()
-    NavHost(nav, startDestination = initial.name) {
-        composable(Start.PAIR.name) {
-            PairingScreen(onPaired = {
-                nav.navigate(Start.OVERVIEW.name) { popUpTo(0) }
-            })
+    // Kept in memory only: a pairing link carries a token.
+    var pairLink by remember { mutableStateOf<PairLink?>(null) }
+    var replaceUrl by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(request) {
+        when (request) {
+            is Request.Pair -> {
+                pairLink = request.link
+                nav.navigate(Routes.PAIR) { launchSingleTop = true }
+            }
+
+            is Request.Open -> {
+                if (context.repository.config.first() != null) {
+                    nav.navigate(Routes.profile(request.profile)) { popUpTo(Routes.OVERVIEW) }
+                }
+            }
+
+            null -> {}
         }
-        composable(Start.OVERVIEW.name) {
-            OverviewScreen(focusProfile = focusProfile, onSettings = { nav.navigate("settings") })
-        }
-        composable("settings") {
-            SettingsScreen(
-                onBack = { nav.popBackStack() },
-                onForgotten = { nav.navigate(Start.PAIR.name) { popUpTo(0) } },
+        if (request != null) onHandled()
+    }
+
+    NavHost(nav, startDestination = initial) {
+        composable(Routes.PAIR) {
+            PairingScreen(
+                onPaired = {
+                    pairLink = null
+                    replaceUrl = null
+                    nav.navigate(Routes.OVERVIEW) { popUpTo(0) }
+                },
+                link = pairLink,
+                initialUrl = replaceUrl,
+                onBack =
+                    if (nav.previousBackStackEntry != null) {
+                        {
+                            pairLink = null
+                            replaceUrl = null
+                            nav.popBackStack()
+                        }
+                    } else {
+                        null
+                    },
             )
         }
+        composable(Routes.OVERVIEW) {
+            OverviewScreen(onOpen = { nav.navigate(Routes.profile(it)) }, onSettings = { nav.navigate(Routes.SETTINGS) })
+        }
+        composable(Routes.PROFILE, arguments = listOf(navArgument("id") { type = NavType.StringType })) { entry ->
+            DetailScreen(profileId = entry.arguments?.getString("id").orEmpty(), onBack = { nav.popBackStack() })
+        }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(
+                onBack = { nav.popBackStack() },
+                onForgotten = { nav.navigate(Routes.PAIR) { popUpTo(0) } },
+                onReplace = { url ->
+                    replaceUrl = url
+                    nav.navigate(Routes.PAIR)
+                },
+                onLicences = { nav.navigate(Routes.LICENCES) },
+            )
+        }
+        composable(Routes.LICENCES) { LicencesScreen(onBack = { nav.popBackStack() }) }
     }
 }

@@ -44,6 +44,8 @@ import net.padalton.doormutex.android.widget.redrawWidgets
 fun SettingsScreen(
     onBack: () -> Unit,
     onForgotten: () -> Unit,
+    onReplace: (url: String) -> Unit,
+    onLicences: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -91,7 +93,9 @@ fun SettingsScreen(
                     modifier = Modifier.testTag("live-switch"),
                 )
             }
+            OutlinedButton(onClick = { config?.let { onReplace(it.url) } }) { Text(stringResource(R.string.settings_replace)) }
             OutlinedButton(onClick = { confirm = true }) { Text(stringResource(R.string.settings_forget)) }
+            TextButton(onClick = onLicences) { Text(stringResource(R.string.settings_licences)) }
             Text(
                 stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
                 style = MaterialTheme.typography.bodySmall,

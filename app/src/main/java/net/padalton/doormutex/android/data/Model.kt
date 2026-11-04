@@ -129,6 +129,22 @@ data class ProfileInfo(
     val state: State,
 )
 
+/** `GET /api/v1/timeline`. */
+@Serializable
+data class Timeline(
+    @Serializable(with = DateTimeSerializer::class) val from: OffsetDateTime,
+    @Serializable(with = DateTimeSerializer::class) val to: OffsetDateTime,
+    val slots: List<Slot> = emptyList(),
+)
+
+/** Body of `PUT /api/v1/override`; [status] and [mode] as on the wire. */
+@Serializable
+data class OverrideRequest(
+    val status: String,
+    val mode: String,
+    val duration: String? = null,
+)
+
 /** One event of `GET /api/v1/events?profile=*`: a profile's new state. */
 @Serializable
 data class ProfileState(

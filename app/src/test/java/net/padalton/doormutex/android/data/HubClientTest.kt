@@ -138,4 +138,47 @@ class HubClientTest {
             val e = runCatching { client.events(hub).toList() }.exceptionOrNull()
             assertTrue(e.toString(), e is HubException.Unauthorized)
         }
+
+    @Test
+    fun `override is a PUT with JSON and returns the new state`() =
+        runTest {
+            respond(200, resource("state-example.json"))
+            val state = client.setOverride(hub, "office", OverrideRequest("dnd", "next_change"))
+            assertEquals(Status.DND, state.status)
+            val request = server.takeRequest()
+            assertEquals("PUT", request.method)
+            assertEquals("/api/v1/override?profile=office", request.url.encodedPath + "?" + request.url.encodedQuery)
+            assertEquals("""{"status":"dnd","mode":"next_change"}""", request.body?.utf8())
+        }
+
+    @Test
+    fun `back to automatic is a DELETE`() =
+        runTest {
+            respond(200, resource("state-example.json"))
+            client.clearOverride(hub, "office")
+            assertEquals("DELETE", server.takeRequest().method)
+        }
+
+    @Test
+    fun `a mode that does not apply now is a 409 with the hub's reason`() =
+        runTest {
+            respond(409, """{"error":"no running event"}""")
+            val e = runCatching { client.setOverride(hub, "office", OverrideRequest("dnd", "end_of_event")) }.exceptionOrNull()
+            assertTrue(e.toString(), e is HubException.Http && e.code == 409 && e.reason == "no running event")
+        }
+
+    @Test
+    fun `timeline parses slots`() =
+        runTest {
+            respond(
+                200,
+                """{"from":"2026-11-04T08:00:00+01:00","to":"2026-11-05T08:00:00+01:00","slots":[""" +
+                    """{"status":"dnd","reason":"calendar","since":"2026-11-04T10:00:00+01:00","until":"2026-11-04T11:00:00+01:00"},""" +
+                    """{"status":"free","since":"2026-11-04T17:00:00+01:00","until":null}]}""",
+            )
+            val t = client.timeline(hub, "office")
+            assertEquals(2, t.slots.size)
+            assertEquals(Reason.CALENDAR, t.slots[0].reason)
+            assertNull(t.slots[1].until)
+        }
 }

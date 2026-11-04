@@ -37,7 +37,6 @@
     <string name="no_profiles">Der Hub zeigt für diesen Token keine Profile.</string>
 
     <string name="pair_title">Mit dem Hub verbinden</string>
-    <string name="pair_intro" tools:ignore="TypographyDashes">Erstelle am Hub einen Token, am besten nur zum Lesen: doormutex-hub token create handy --read-only</string>
     <string name="pair_url">Adresse des Hubs</string>
     <string name="pair_url_hint">https://doormutex.home.example</string>
     <string name="pair_token">Token</string>
@@ -92,4 +91,28 @@
 
     <string name="widget_all_name">doormutex – alle Ampeln</string>
     <string name="widget_all_description">Alle Ampeln: Lampe, Name, Status und bis wann</string>
+
+    <string name="pair_intro">Öffne in der Web-Oberfläche des Hubs Einstellungen → Handys und Tokens → Handy hinzufügen und scanne den QR-Code.</string>
+    <string name="pair_scan">QR-Code scannen</string>
+    <string name="pair_manual" tools:ignore="TypographyDashes">Oder von Hand, mit einem Token vom Hub (am besten nur zum Lesen: doormutex-hub token create handy --read-only):</string>
+    <string name="scan_hint">Richte die Kamera auf den QR-Code in der Web-Oberfläche des Hubs.</string>
+    <string name="scan_no_camera">Ohne Kamera kann die App den Code nicht scannen. Erlaube sie in den App-Einstellungen oder gib Adresse und Token von Hand ein.</string>
+    <string name="detail_planned">Nächste 24 Stunden</string>
+    <string name="detail_nothing_planned">Nichts geplant.</string>
+    <string name="detail_slot">%1$s – %2$s</string>
+    <string name="detail_slot_open">ab %1$s</string>
+    <string name="detail_eink">E-Ink-Anzeige</string>
+    <string name="detail_eink_description">Was die E-Ink-Anzeige von %1$s zeigt</string>
+    <string name="detail_switch">Schalten</string>
+    <string name="detail_read_only">Dieser Token darf nur schauen; zum Schalten braucht es einen Token mit vollen Rechten.</string>
+    <string name="detail_failed">Der Hub hat nicht geschaltet: %1$s</string>
+    <string name="detail_unreachable">Der Hub antwortet nicht.</string>
+    <string name="switch_red">Rot</string>
+    <string name="switch_red_hour">Rot für 1 h</string>
+    <string name="switch_green">Grün</string>
+    <string name="switch_off">Aus</string>
+    <string name="switch_automatic">Automatisch</string>
+    <string name="settings_replace">Token ersetzen</string>
+    <string name="settings_licences">Open-Source-Lizenzen</string>
+    <string name="licences_title">Open-Source-Lizenzen</string>
 </resources>

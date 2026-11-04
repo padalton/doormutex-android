@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -100,7 +99,7 @@ class OverviewViewModel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewScreen(
-    focusProfile: String?,
+    onOpen: (profile: String) -> Unit,
     onSettings: () -> Unit,
     vm: OverviewViewModel = viewModel(),
 ) {
@@ -131,12 +130,6 @@ fun OverviewScreen(
         }
     }
 
-    val listState = rememberLazyListState()
-    LaunchedEffect(focusProfile, snapshot.profiles.size) {
-        val index = snapshot.profiles.indexOfFirst { it.id == focusProfile }
-        if (index >= 0) listState.animateScrollToItem(index + 1)
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -157,7 +150,6 @@ fun OverviewScreen(
             val freshness = Freshness.of(snapshot, now, LIVE_INTERVAL)
             val localNetwork = rememberLocalNetworkAccess()
             LazyColumn(
-                state = listState,
                 modifier = Modifier.fillMaxSize().testTag("overview"),
                 contentPadding =
                     androidx.compose.foundation.layout
@@ -169,7 +161,7 @@ fun OverviewScreen(
                 if (snapshot.profiles.isEmpty() && snapshot.fetchedAt != 0L) {
                     item { Text(stringResource(R.string.no_profiles)) }
                 }
-                items(snapshot.profiles, key = { it.id }) { ProfileCard(it, freshness.stale) }
+                items(snapshot.profiles, key = { it.id }) { ProfileCard(it, freshness.stale) { onOpen(it.id) } }
             }
         }
     }
@@ -201,30 +193,42 @@ private fun StaleBanner(
 }
 
 @Composable
-private fun ProfileCard(
+internal fun ProfileCard(
+    profile: ProfileInfo,
+    stale: Boolean,
+    onClick: (() -> Unit)? = null,
+) {
+    val card = Modifier.fillMaxWidth().testTag("profile-${profile.id}")
+    if (onClick != null) {
+        Card(onClick = onClick, modifier = card) { ProfileCardContent(profile, stale) }
+    } else {
+        Card(card) { ProfileCardContent(profile, stale) }
+    }
+}
+
+@Composable
+private fun ProfileCardContent(
     profile: ProfileInfo,
     stale: Boolean,
 ) {
     val context = LocalContext.current
     val state = profile.state
     val muted = if (stale) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
-    Card(Modifier.fillMaxWidth()) {
-        Row(
-            Modifier
-                .padding(16.dp)
-                .clearAndSetSemantics { contentDescription = context.describe(profile) },
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TrafficLight(state.light, dimmed = stale)
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(profile.name, style = MaterialTheme.typography.labelLarge, color = muted)
-                Text(context.statusText(state), style = MaterialTheme.typography.titleLarge, color = muted)
-                context.reasonText(state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = muted) }
-                Text(context.untilText(state), style = MaterialTheme.typography.bodyMedium, color = muted)
-                context.nextFreeText(state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = muted) }
-                state.message?.let { Text("“$it”", style = MaterialTheme.typography.bodyLarge, color = muted) }
-            }
+    Row(
+        Modifier
+            .padding(16.dp)
+            .clearAndSetSemantics { contentDescription = context.describe(profile) },
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        TrafficLight(state.light, dimmed = stale)
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(profile.name, style = MaterialTheme.typography.labelLarge, color = muted)
+            Text(context.statusText(state), style = MaterialTheme.typography.titleLarge, color = muted)
+            context.reasonText(state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = muted) }
+            Text(context.untilText(state), style = MaterialTheme.typography.bodyMedium, color = muted)
+            context.nextFreeText(state)?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = muted) }
+            state.message?.let { Text("“$it”", style = MaterialTheme.typography.bodyLarge, color = muted) }
         }
     }
 }

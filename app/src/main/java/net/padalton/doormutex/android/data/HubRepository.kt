@@ -120,6 +120,23 @@ class HubRepository(
             next
         }
 
+    private suspend fun requireConfig() = config.first() ?: throw HubException.Unauthorized()
+
+    suspend fun timeline(profile: String) = client.timeline(requireConfig(), profile)
+
+    suspend fun eink(profile: String) = client.eink(requireConfig(), profile)
+
+    /** Switches [profile] and stores the state the hub answers with. */
+    suspend fun switch(
+        profile: ProfileInfo,
+        switch: Switch,
+    ) {
+        val config = requireConfig()
+        val request = switch.request(profile.mode)
+        val state = if (request == null) client.clearOverride(config, profile.id) else client.setOverride(config, profile.id, request)
+        apply(ProfileState(profile.id, state))
+    }
+
     /** The hub's event stream for [config]; see [HubClient.events]. */
     fun events(config: HubConfig) = client.events(config)
 

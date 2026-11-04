@@ -10,9 +10,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import okhttp3.ResponseBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -63,6 +66,45 @@ class HubClient(
 
     /** `GET /api/v1/me`; null on a hub older than API 0.2.0, which has no such route. */
     suspend fun me(hub: HubConfig): Me? = get(hub, "/api/v1/me", Me.serializer(), notFoundIsNull = true)
+
+    /** `GET /api/v1/timeline`: planned slots of [profile] for the next 24 hours. */
+    suspend fun timeline(
+        hub: HubConfig,
+        profile: String,
+    ): Timeline = get(hub, "/api/v1/timeline?profile=${profile.encoded()}", Timeline.serializer())!!
+
+    /** `GET /api/v1/eink.png`: what the e-ink display of [profile] shows, as PNG. */
+    suspend fun eink(
+        hub: HubConfig,
+        profile: String,
+    ): ByteArray = exchange(hub, "GET", "/api/v1/eink.png?profile=${profile.encoded()}", null, "image/png") { it.bytes() }!!
+
+    /** `PUT /api/v1/override` (full tokens only): returns the new state. */
+    suspend fun setOverride(
+        hub: HubConfig,
+        profile: String,
+        override: OverrideRequest,
+    ): State =
+        exchange(
+            hub,
+            "PUT",
+            "/api/v1/override?profile=${profile.encoded()}",
+            HubJson.encodeToString(OverrideRequest.serializer(), override),
+            "application/json",
+        ) {
+            HubJson.decodeFromString(State.serializer(), it.string())
+        }!!
+
+    /** `DELETE /api/v1/override`: back to automatic; returns the new state. */
+    suspend fun clearOverride(
+        hub: HubConfig,
+        profile: String,
+    ): State =
+        exchange(hub, "DELETE", "/api/v1/override?profile=${profile.encoded()}", null, "application/json") {
+            HubJson.decodeFromString(State.serializer(), it.string())
+        }!!
+
+    private fun String.encoded() = java.net.URLEncoder.encode(this, "UTF-8") // the Charset overload needs API 33
 
     /**
      * `GET /api/v1/events?profile=*` (hub API 0.2.0). Completes when the hub
@@ -141,18 +183,37 @@ class HubClient(
         path: String,
         serializer: KSerializer<T>,
         notFoundIsNull: Boolean = false,
+    ): T? = exchange(hub, "GET", path, null, "application/json", notFoundIsNull) { HubJson.decodeFromString(serializer, it.string()) }
+
+    /**
+     * One request. [decode] reads a successful body. Errors become
+     * [HubException]s; a 404 is null when [notFoundIsNull].
+     */
+    private suspend fun <T> exchange(
+        hub: HubConfig,
+        method: String,
+        path: String,
+        json: String?,
+        accept: String,
+        notFoundIsNull: Boolean = false,
+        decode: (ResponseBody) -> T,
     ): T? =
         withContext(Dispatchers.IO) {
             try {
-                http.newCall(request(hub, path, "application/json")).execute().use { response ->
-                    val body = response.body.string()
+                val body = json?.toRequestBody("application/json".toMediaType())
+                val request =
+                    request(hub, path, accept)
+                        .newBuilder()
+                        .method(method, body)
+                        .build()
+                http.newCall(request).execute().use { response ->
                     if (response.code == 404 && notFoundIsNull) return@withContext null
-                    check(response, response.isSuccessful) { body }
-                    HubJson.decodeFromString(serializer, body)
+                    check(response, response.isSuccessful) { response.body.string() }
+                    decode(response.body)
                 }
             } catch (e: IOException) {
                 // Path and exception only: the token is in a header, never in the URL or message.
-                Log.i(TAG, "GET $path: ${e.javaClass.simpleName}: ${e.message}")
+                Log.i(TAG, "$method $path: ${e.javaClass.simpleName}: ${e.message}")
                 throw HubException.Unreachable(e)
             } catch (e: SerializationException) {
                 throw HubException.BadResponse(e)

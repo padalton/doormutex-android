@@ -34,39 +34,46 @@ fun Context.statusText(state: State): String =
             }
 
             else -> {
-                when (state.status) {
-                    Status.FREE -> R.string.status_free
-                    Status.WORKING -> R.string.status_working
-                    Status.DND -> R.string.status_dnd
-                    Status.AWAY -> R.string.status_away
-                    Status.UNKNOWN -> R.string.status_unknown
-                }
+                statusRes(state.status)
             }
         },
     )
 
+fun Context.statusText(status: Status): String = getString(statusRes(status))
+
+private fun statusRes(status: Status) =
+    when (status) {
+        Status.FREE -> R.string.status_free
+        Status.WORKING -> R.string.status_working
+        Status.DND -> R.string.status_dnd
+        Status.AWAY -> R.string.status_away
+        Status.UNKNOWN -> R.string.status_unknown
+    }
+
 /** "calendar – video call"; the detail is never an event title (hub rule). */
 fun Context.reasonText(state: State): String? {
-    val reason =
-        when (state.reason) {
-            Reason.OVERRIDE -> R.string.reason_override
-            Reason.POMODORO -> R.string.reason_pomodoro
-            Reason.POMODORO_BREAK -> R.string.reason_pomodoro_break
-            Reason.MICROPHONE -> R.string.reason_microphone
-            Reason.CAMERA -> R.string.reason_camera
-            Reason.SCREEN_LOCKED -> R.string.reason_screen_locked
-            Reason.PC_OFF -> R.string.reason_pc_off
-            Reason.COMPANION_LOST -> R.string.reason_companion_lost
-            Reason.COMPANION_OFFLINE -> R.string.reason_companion_offline
-            Reason.CALENDAR -> R.string.reason_calendar
-            Reason.WORK_HOURS -> R.string.reason_work_hours
-            Reason.SIGNAL -> R.string.reason_signal
-            Reason.DEFAULT -> R.string.reason_default
-            Reason.UNKNOWN -> null
-        }?.let(::getString)
+    val reason = reasonText(state.reason)
     val detail = state.detail?.takeIf { it.isNotBlank() }?.replace('_', ' ')
     return listOfNotNull(reason, detail).joinToString(" – ").ifEmpty { null }
 }
+
+fun Context.reasonText(reason: Reason): String? =
+    when (reason) {
+        Reason.OVERRIDE -> R.string.reason_override
+        Reason.POMODORO -> R.string.reason_pomodoro
+        Reason.POMODORO_BREAK -> R.string.reason_pomodoro_break
+        Reason.MICROPHONE -> R.string.reason_microphone
+        Reason.CAMERA -> R.string.reason_camera
+        Reason.SCREEN_LOCKED -> R.string.reason_screen_locked
+        Reason.PC_OFF -> R.string.reason_pc_off
+        Reason.COMPANION_LOST -> R.string.reason_companion_lost
+        Reason.COMPANION_OFFLINE -> R.string.reason_companion_offline
+        Reason.CALENDAR -> R.string.reason_calendar
+        Reason.WORK_HOURS -> R.string.reason_work_hours
+        Reason.SIGNAL -> R.string.reason_signal
+        Reason.DEFAULT -> R.string.reason_default
+        Reason.UNKNOWN -> null
+    }?.let(::getString)
 
 /** "until 17:00", "until Thu 09:00" or "until further notice". */
 fun Context.untilText(state: State): String =

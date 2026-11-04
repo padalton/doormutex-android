@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Only what issue padalton/doormutex#28 allows, plus ACCESS_LOCAL_NETWORK
-         and RECEIVE_BOOT_COMPLETED. CAMERA comes with QR pairing (M3). -->
+         and RECEIVE_BOOT_COMPLETED. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Live mode: a foreground service keeps the event stream open on the
@@ -13,6 +13,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- QR pairing; asked for only when the scanner opens. Not required:
+         without a camera, pairing by hand or by link still works. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <!-- Android 17+: runtime permission to reach devices in the local
          network, i.e. the hub. Ignored on older versions. -->
     <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
@@ -40,6 +44,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Pairing link from the hub's QR code (Settings → Add a phone). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="doormutex" android:host="pair" />
             </intent-filter>
         </activity>
 
