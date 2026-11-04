@@ -1,0 +1,25 @@
+doormutex ist eine Ampel an der Tür von Homeoffice oder Zimmer: Grün heißt herein, Gelb heißt ich arbeite, Rot heißt bitte nicht stören. Diese App zeigt alle doormutex-Ampeln deines Zuhauses am Handy – direkt am Startbildschirm, ohne etwas zu öffnen.
+
+<b>Braucht einen doormutex-Hub</b> in deinem Heimnetz (Open Source: github.com/padalton/doormutex). Ohne Hub hat die App nichts anzuzeigen.
+
+<b>Widgets</b>
+• Eine Ampel (1×1 bis 2×2): Lampe, Status und bis wann
+• Alle Ampeln (ab 3×2): eine Zeile pro Ampel
+• Live zu Hause: Die Widgets wechseln, sobald die Ampel wechselt (abschaltbar; dann alle 15 Minuten)
+
+<b>App</b>
+• Übersicht aller Ampeln mit Grund, bis wann und der nächsten freien Zeit
+• Detail: die nächsten 24 Stunden und das Bild der E-Ink-Anzeige
+• Rot, Grün, Aus oder zurück auf Automatisch schalten – nur mit einem Token, der schalten darf
+
+<b>Ehrlich bei alten Daten</b>
+Ist der Hub nicht erreichbar, dimmen App und Widgets den letzten Stand und sagen, seit wann. Ein alter Stand wird nie als aktuell gezeigt.
+
+<b>Privat von Grund auf</b>
+• Koppeln per QR-Code aus der Web-Oberfläche des Hubs; ein Token nur zum Lesen reicht
+• Die App spricht nur mit deinem Hub. Kein Konto, keine Cloud, keine Werbung, keine Analyse, kein Tracking
+• Der Token ist am Handy verschlüsselt und von Backups ausgenommen
+
+Berechtigungen: Netzwerk und „Geräte in der Nähe“ (um den Hub im Heimnetz zu erreichen), Kamera (nur beim Scannen des QR-Codes), Benachrichtigungen (die unauffällige „live“-Benachrichtigung), Start beim Hochfahren (um den Live-Modus fortzusetzen).
+
+Open Source (Apache-2.0): github.com/padalton/doormutex-android

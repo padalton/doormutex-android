@@ -4,7 +4,7 @@ A native Android app with home-screen widgets that show the state of every
 [doormutex](https://github.com/padalton/doormutex) light at a glance – without
 opening anything.
 
-**Status:** milestones 1 (read and show), 2 (live) and 3 (pairing and roles) done. The original plan – scope, stack,
+**Status:** milestones 1–4 done; first closed test on Google Play. The original plan – scope, stack,
 milestones – is [padalton/doormutex#28](https://github.com/padalton/doormutex/issues/28);
 what is left is listed below. The hub side
 (read-only tokens, multi-profile event stream, QR pairing) is
@@ -52,8 +52,9 @@ Next:
 
 - **M2 follow-up:** measure the battery cost of live mode over a day on a real
   phone; push (UnifiedPush / Web Push from the hub) only if it is too high.
-- **M4 – release:** signed AAB and APK from CI, Play internal testing →
-  production, screenshots, F-Droid if wanted.
+- **After the alpha:** production on Google Play, a link from the main
+  repository's `docs/android.md` and doormutex.org, F-Droid if wanted (no Play
+  Services, no dependency metadata, store texts in `fastlane/` already).
 
 ## Privacy and security
 
@@ -100,6 +101,15 @@ loopback counts as private, so no firewall changes are needed.
 
 `app/src/test/resources/api/state-example.json` is the `State` example from the
 hub's `api/openapi.yaml`; copy it again when the API changes.
+
+## Release
+
+Releasing on Google Play – keys, tracks, store listing, data safety and the
+foreground service declaration – is described in
+[`docs/play-console.md`](docs/play-console.md). In short: a tag
+`v<versionName>` builds a signed AAB (for Play) and APK (GitHub release) in
+CI; locally, `./gradlew bundleRelease` with the `DOORMUTEX_KEYSTORE…`
+variables set. Privacy policy: [`PRIVACY.md`](PRIVACY.md).
 
 ## Licence
 

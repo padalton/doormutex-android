@@ -1,0 +1,25 @@
+doormutex is a traffic light at the door of a home office or a room: green means come in, yellow means working, red means do not disturb. This app shows every doormutex light of your home on the phone – on the home screen, without opening anything.
+
+<b>Needs a doormutex hub</b> in your home network (open source: github.com/padalton/doormutex). Without one the app has nothing to show.
+
+<b>Widgets</b>
+• One light (1×1 up to 2×2): lamp, status and until when
+• All lights (3×2 and up): one row per light
+• Live at home: the widgets change the moment the light does (can be switched off; then every 15 minutes)
+
+<b>App</b>
+• Overview of every light with reason, until when and the next free slot
+• Detail: the next 24 hours and the picture of the e-ink display
+• Switch red, green, off or back to automatic – only with a token that may switch
+
+<b>Honest about old data</b>
+When the hub cannot be reached, the app and the widgets dim the last state and say since when. An old state is never shown as current.
+
+<b>Private by design</b>
+• Pair by scanning the QR code in the hub's web UI; a read-only token is enough
+• The app only talks to your hub. No account, no cloud, no ads, no analytics, no tracking
+• The token is encrypted on the phone and excluded from backups
+
+Permissions: network and "nearby devices" (to reach the hub in your home network), camera (only while scanning the QR code), notifications (the quiet "live" notification), start at boot (to resume live mode).
+
+Open source (Apache-2.0): github.com/padalton/doormutex-android

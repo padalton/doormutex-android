@@ -1,0 +1,1 @@
+First test release: widgets for one or all lights, live at home, QR pairing, switches for full tokens.

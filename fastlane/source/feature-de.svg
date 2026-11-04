@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <rect width="1024" height="500" fill="#F2F0EA"/>
+  <g transform="translate(150,70)">
+    <rect x="0" y="0" width="160" height="360" rx="40" fill="#24262C"/>
+    <circle cx="80" cy="75" r="50" fill="#E5322D"/>
+    <circle cx="80" cy="180" r="50" fill="#3A3D44"/>
+    <circle cx="80" cy="285" r="50" fill="#1FA84F"/>
+  </g>
+  <text x="400" y="235" font-family="sans-serif" font-size="92" font-weight="700" fill="#24262C">doormutex</text>
+  <text x="404" y="305" font-family="sans-serif" font-size="38" fill="#3A3D44">Darf ich rein? Ein Blick genügt.</text>
+</svg>

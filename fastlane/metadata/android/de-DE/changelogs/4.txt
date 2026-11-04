@@ -1,0 +1,1 @@
+Erste Testversion: Widgets für eine oder alle Ampeln, live zu Hause, Koppeln per QR-Code, Schalter für Tokens mit vollen Rechten.
