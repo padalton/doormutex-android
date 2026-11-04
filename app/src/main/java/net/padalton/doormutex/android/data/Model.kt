@@ -129,6 +129,13 @@ data class ProfileInfo(
     val state: State,
 )
 
+/** One event of `GET /api/v1/events?profile=*`: a profile's new state. */
+@Serializable
+data class ProfileState(
+    val profile: String,
+    val state: State,
+)
+
 /** `GET /api/v1/me`, hub API 0.2.0 and later. */
 @Serializable
 data class Me(

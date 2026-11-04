@@ -35,3 +35,24 @@ data class Snapshot(
     val attemptedAt: Long = 0,
     val problem: Problem? = null,
 )
+
+/**
+ * [update] applied to a known profile: its new state, and the snapshot is
+ * current as of [now]. Null when the profile is unknown (added on the hub
+ * since the last full fetch): then fetch everything to learn its name.
+ */
+fun Snapshot.with(
+    update: ProfileState,
+    now: Long,
+): Snapshot? {
+    if (profiles.none { it.id == update.profile }) return null
+    return copy(
+        profiles = profiles.map { if (it.id == update.profile) it.copy(state = update.state) else it },
+        fetchedAt = now,
+        attemptedAt = now,
+        problem = null,
+    )
+}
+
+/** Nothing changed, but the hub confirmed it at [now] (keep-alive on the open stream). */
+fun Snapshot.confirmed(now: Long) = copy(fetchedAt = now, attemptedAt = now, problem = null)

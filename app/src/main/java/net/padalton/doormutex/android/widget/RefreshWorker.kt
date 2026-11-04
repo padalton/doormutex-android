@@ -48,4 +48,5 @@ suspend fun refreshAndRedraw(context: Context) {
 
 suspend fun redrawWidgets(context: Context) {
     SingleLightWidget().updateAll(context)
+    AllLightsWidget().updateAll(context)
 }

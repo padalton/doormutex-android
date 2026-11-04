@@ -172,7 +172,7 @@ private fun Texts(
     }
 }
 
-private fun staleText(
+internal fun staleText(
     context: Context,
     snapshot: Snapshot,
     freshness: Freshness,
@@ -195,7 +195,7 @@ private fun staleSuffix(
 
 /** Widgets cannot animate cheaply: blinking lamps are drawn lit, with a text marker. */
 @Composable
-private fun Lamp(
+internal fun Lamp(
     light: Light,
     dimmed: Boolean,
     height: androidx.compose.ui.unit.Dp,
@@ -284,3 +284,23 @@ private fun PreviewLarge() = GlanceTheme { SingleLight(previewSnapshot(false), n
 @androidx.glance.preview.Preview(widthDp = 130, heightDp = 130)
 @Composable
 private fun PreviewLargeStale() = GlanceTheme { SingleLight(previewSnapshot(true), null, System.currentTimeMillis()) }
+
+/** Three profiles in different states, for the all-lights previews. */
+internal fun previewSnapshots(stale: Boolean): Snapshot {
+    val one = previewSnapshot(stale)
+    val now = java.time.OffsetDateTime.now()
+    val free =
+        net.padalton.doormutex.android.data.State(
+            status = net.padalton.doormutex.android.data.Status.FREE,
+            light = Light.GREEN,
+            reason = net.padalton.doormutex.android.data.Reason.DEFAULT,
+            since = now.minusHours(1),
+            updated = now,
+        )
+    val away = free.copy(status = net.padalton.doormutex.android.data.Status.AWAY, light = Light.OFF)
+    return one.copy(
+        profiles =
+            one.profiles +
+                listOf(ProfileInfo("teen", "Teen", "teen", free), ProfileInfo("garage", "Garage", "office", away)),
+    )
+}

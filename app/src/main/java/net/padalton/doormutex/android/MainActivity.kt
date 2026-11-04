@@ -13,10 +13,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import net.padalton.doormutex.android.live.LiveService
 import net.padalton.doormutex.android.ui.overview.OverviewScreen
 import net.padalton.doormutex.android.ui.pairing.PairingScreen
 import net.padalton.doormutex.android.ui.settings.SettingsScreen
@@ -31,6 +34,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         focusProfile = intent.getStringExtra(EXTRA_PROFILE)
         setContent { DoormutexTheme { App(focusProfile) } }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // The app in the foreground is one of the few moments a foreground service may start.
+        lifecycleScope.launch { LiveService.sync(this@MainActivity) }
     }
 
     override fun onNewIntent(intent: Intent) {

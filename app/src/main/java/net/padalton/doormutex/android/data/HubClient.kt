@@ -2,12 +2,17 @@ package net.padalton.doormutex.android.data
 
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.ListSerializer
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -50,11 +55,86 @@ sealed class HubException(
 class HubClient(
     private val http: OkHttpClient = defaultHttpClient(),
 ) {
+    // The hub sends a keep-alive every 25 s; no byte for a minute means the connection is dead.
+    private val stream = http.newBuilder().readTimeout(STREAM_READ_TIMEOUT_S, TimeUnit.SECONDS).build()
+
     /** `GET /api/v1/profiles`: every profile the token sees, with its state. */
     suspend fun profiles(hub: HubConfig): List<ProfileInfo> = get(hub, "/api/v1/profiles", ListSerializer(ProfileInfo.serializer()))!!
 
     /** `GET /api/v1/me`; null on a hub older than API 0.2.0, which has no such route. */
     suspend fun me(hub: HubConfig): Me? = get(hub, "/api/v1/me", Me.serializer(), notFoundIsNull = true)
+
+    /**
+     * `GET /api/v1/events?profile=*` (hub API 0.2.0). Completes when the hub
+     * ends the stream (after 10 minutes, by design): reconnect then. Throws
+     * [HubException] like the other calls; a hub before 0.2.0 answers 404.
+     */
+    fun events(hub: HubConfig): Flow<StreamEvent> =
+        callbackFlow {
+            val call = stream.newCall(request(hub, "/api/v1/events?profile=*", "text/event-stream"))
+            launch(Dispatchers.IO) {
+                try {
+                    call.execute().use { response ->
+                        check(response, response.isSuccessful) { response.body.string() }
+                        val source = response.body.source()
+                        val parser = SseParser()
+                        while (true) {
+                            val line = source.readUtf8Line() ?: break
+                            when (val raw = parser.line(line)) {
+                                SseParser.Raw.Comment -> {
+                                    send(StreamEvent.KeepAlive)
+                                }
+
+                                is SseParser.Raw.Event -> {
+                                    if (raw.type == "state") {
+                                        send(StreamEvent.Update(HubJson.decodeFromString(ProfileState.serializer(), raw.data)))
+                                    }
+                                }
+
+                                null -> {}
+                            }
+                        }
+                    }
+                    close()
+                } catch (e: IOException) {
+                    // Also the way a cancelled call ends; then nobody listens any more.
+                    Log.i(TAG, "events: ${e.javaClass.simpleName}: ${e.message}")
+                    close(HubException.Unreachable(e))
+                } catch (e: HubException) {
+                    close(e)
+                } catch (e: SerializationException) {
+                    close(HubException.BadResponse(e))
+                } catch (e: IllegalArgumentException) {
+                    close(HubException.BadResponse(e))
+                }
+            }
+            awaitClose { call.cancel() }
+        }
+
+    private fun request(
+        hub: HubConfig,
+        path: String,
+        accept: String,
+    ) = Request
+        .Builder()
+        .url(hub.url + path)
+        .header("Authorization", "Bearer ${hub.token}")
+        .header("Accept", accept)
+        .build()
+
+    /** Maps a non-successful response to a [HubException]. */
+    private inline fun check(
+        response: Response,
+        ok: Boolean,
+        body: () -> String,
+    ) {
+        if (ok) return
+        when (response.code) {
+            401 -> throw HubException.Unauthorized()
+            403 -> throw HubException.Forbidden(errorText(body()))
+            else -> throw HubException.Http(response.code, errorText(body()))
+        }
+    }
 
     private suspend fun <T> get(
         hub: HubConfig,
@@ -64,22 +144,11 @@ class HubClient(
     ): T? =
         withContext(Dispatchers.IO) {
             try {
-                val request =
-                    Request
-                        .Builder()
-                        .url(hub.url + path)
-                        .header("Authorization", "Bearer ${hub.token}")
-                        .header("Accept", "application/json")
-                        .build()
-                http.newCall(request).execute().use { response ->
+                http.newCall(request(hub, path, "application/json")).execute().use { response ->
                     val body = response.body.string()
-                    when {
-                        response.isSuccessful -> HubJson.decodeFromString(serializer, body)
-                        response.code == 404 && notFoundIsNull -> null
-                        response.code == 401 -> throw HubException.Unauthorized()
-                        response.code == 403 -> throw HubException.Forbidden(errorText(body))
-                        else -> throw HubException.Http(response.code, errorText(body))
-                    }
+                    if (response.code == 404 && notFoundIsNull) return@withContext null
+                    check(response, response.isSuccessful) { body }
+                    HubJson.decodeFromString(serializer, body)
                 }
             } catch (e: IOException) {
                 // Path and exception only: the token is in a header, never in the URL or message.
@@ -104,6 +173,7 @@ class HubClient(
 
     companion object {
         private const val TAG = "doormutex"
+        private const val STREAM_READ_TIMEOUT_S = 60L
 
         fun defaultHttpClient(): OkHttpClient =
             OkHttpClient

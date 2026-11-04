@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,13 +45,17 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.padalton.doormutex.android.R
+import net.padalton.doormutex.android.app
 import net.padalton.doormutex.android.data.Freshness
+import net.padalton.doormutex.android.data.LIVE_INTERVAL
 import net.padalton.doormutex.android.data.Problem
 import net.padalton.doormutex.android.data.ProfileInfo
 import net.padalton.doormutex.android.data.Snapshot
+import net.padalton.doormutex.android.live.LiveService
 import net.padalton.doormutex.android.repository
 import net.padalton.doormutex.android.ui.LocalNetworkHint
 import net.padalton.doormutex.android.ui.TrafficLight
@@ -58,14 +63,14 @@ import net.padalton.doormutex.android.ui.describe
 import net.padalton.doormutex.android.ui.nextFreeText
 import net.padalton.doormutex.android.ui.reasonText
 import net.padalton.doormutex.android.ui.rememberLocalNetworkAccess
+import net.padalton.doormutex.android.ui.rememberNotificationRequest
 import net.padalton.doormutex.android.ui.statusText
 import net.padalton.doormutex.android.ui.time
 import net.padalton.doormutex.android.ui.untilText
 import net.padalton.doormutex.android.widget.refreshAndRedraw
 import kotlin.time.Duration.Companion.seconds
 
-/** How often the overview polls while it is visible (M2 replaces this with SSE). */
-val POLL_INTERVAL = 30.seconds
+private val TICK = 5.seconds
 
 class OverviewViewModel(
     app: Application,
@@ -88,8 +93,8 @@ class OverviewViewModel(
         }
     }
 
-    /** Silent refresh for polling: no spinner. */
-    suspend fun poll() = refreshAndRedraw(getApplication())
+    /** Live updates while the screen is visible (shared with the live service, see [net.padalton.doormutex.android.DoormutexApp.live]). */
+    suspend fun live(): Nothing = getApplication<Application>().app.live.collect {}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,15 +107,27 @@ fun OverviewScreen(
     val snapshot by vm.snapshot.collectAsStateWithLifecycle()
     var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
-    // Poll while visible; also re-evaluate staleness on every tick.
+    // Live while visible; re-evaluate staleness every few seconds.
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(lifecycle) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            launch { vm.live() }
             while (true) {
-                vm.poll()
                 now = System.currentTimeMillis()
-                delay(POLL_INTERVAL)
+                delay(TICK)
             }
+        }
+    }
+
+    // Live mode is on by default; ask once for its notification (pairing asks too, see PairingScreen).
+    val context = LocalContext.current
+    val notifications = rememberNotificationRequest()
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(Unit) {
+        val repository = context.repository
+        if (repository.liveMode.first() && !repository.notificationsAsked.first()) {
+            repository.markNotificationsAsked()
+            notifications { scope.launch { LiveService.sync(context) } }
         }
     }
 
@@ -137,7 +154,7 @@ fun OverviewScreen(
             onRefresh = vm::refresh,
             modifier = Modifier.fillMaxSize().padding(padding),
         ) {
-            val freshness = Freshness.of(snapshot, now, POLL_INTERVAL)
+            val freshness = Freshness.of(snapshot, now, LIVE_INTERVAL)
             val localNetwork = rememberLocalNetworkAccess()
             LazyColumn(
                 state = listState,

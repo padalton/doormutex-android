@@ -42,9 +42,11 @@ import net.padalton.doormutex.android.data.HubException
 import net.padalton.doormutex.android.data.HubUrl
 import net.padalton.doormutex.android.data.PairCheck
 import net.padalton.doormutex.android.data.Role
+import net.padalton.doormutex.android.live.LiveService
 import net.padalton.doormutex.android.repository
 import net.padalton.doormutex.android.ui.LocalNetworkHint
 import net.padalton.doormutex.android.ui.rememberLocalNetworkAccess
+import net.padalton.doormutex.android.ui.rememberNotificationRequest
 import net.padalton.doormutex.android.widget.RefreshWorker
 import net.padalton.doormutex.android.widget.redrawWidgets
 
@@ -103,8 +105,10 @@ class PairingViewModel(
         viewModelScope.launch {
             val app = getApplication<Application>()
             app.repository.save(found.check)
+            app.repository.markNotificationsAsked()
             RefreshWorker.schedule(app)
             redrawWidgets(app)
+            LiveService.sync(app)
             onDone()
         }
     }
@@ -117,6 +121,8 @@ fun PairingScreen(
     vm: PairingViewModel = viewModel(),
 ) {
     val localNetwork = rememberLocalNetworkAccess()
+    // Live mode is on by default; its notification needs the permission.
+    val notifications = rememberNotificationRequest()
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.pair_title)) }) }) { padding ->
         Column(
             Modifier
@@ -206,7 +212,7 @@ fun PairingScreen(
                 }
 
                 is PairState.Found -> {
-                    Found(s.check) { vm.save(onPaired) }
+                    Found(s.check) { notifications { vm.save(onPaired) } }
                 }
             }
         }

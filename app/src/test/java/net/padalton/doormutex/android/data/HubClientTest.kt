@@ -1,5 +1,6 @@
 package net.padalton.doormutex.android.data
 
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -100,4 +101,41 @@ class HubClientTest {
     fun `the token never shows up in toString`() {
         assertTrue("dm_secret" !in hub.toString())
     }
+
+    @Test
+    fun `events parse states and keep-alives until the hub ends the stream`() =
+        runTest {
+            val state = resource("state-example.json").replace("\n", "")
+            server.enqueue(
+                MockResponse
+                    .Builder()
+                    .code(200)
+                    .setHeader("Content-Type", "text/event-stream")
+                    .body("event: state\ndata: {\"profile\":\"office\",\"state\":$state}\n\n: keep-alive\n\n")
+                    .build(),
+            )
+            val events = client.events(hub).toList()
+            assertEquals(2, events.size)
+            assertEquals("office", (events[0] as StreamEvent.Update).update.profile)
+            assertEquals(StreamEvent.KeepAlive, events[1])
+            val request = server.takeRequest()
+            assertEquals("/api/v1/events?profile=*", request.url.encodedPath + "?" + request.url.encodedQuery)
+            assertEquals("Bearer dm_secret", request.headers["Authorization"])
+        }
+
+    @Test
+    fun `events on a hub without the multi-profile stream fail with 404`() =
+        runTest {
+            respond(404, """{"error":"unknown profile *"}""")
+            val e = runCatching { client.events(hub).toList() }.exceptionOrNull()
+            assertTrue(e.toString(), e is HubException.Http && e.code == 404)
+        }
+
+    @Test
+    fun `events with a revoked token fail with Unauthorized`() =
+        runTest {
+            respond(401, """{"error":"invalid token"}""")
+            val e = runCatching { client.events(hub).toList() }.exceptionOrNull()
+            assertTrue(e.toString(), e is HubException.Unauthorized)
+        }
 }

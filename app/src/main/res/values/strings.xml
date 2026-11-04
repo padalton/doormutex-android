@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Status and reason texts match the hub and the Plasma widget (plasmoid/translate in padalton/doormutex). -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name" translatable="false">doormutex</string>
 
     <string name="status_free">Come in</string>
@@ -41,7 +41,7 @@
 
     <!-- Pairing -->
     <string name="pair_title">Connect to your hub</string>
-    <string name="pair_intro">Create a token on the hub, ideally a read-only one: doormutex-hub token create phone --read-only</string>
+    <string name="pair_intro" tools:ignore="TypographyDashes">Create a token on the hub, ideally a read-only one: doormutex-hub token create phone --read-only</string>
     <string name="pair_url">Hub address</string>
     <string name="pair_url_hint">https://doormutex.home.example</string>
     <string name="pair_token">Token</string>
@@ -87,4 +87,17 @@
     <string name="widget_not_paired">Open the app to connect</string>
     <string name="widget_pick_profile">Which light should this widget show?</string>
     <string name="widget_no_hub">Connect the app to your hub first.</string>
+
+    <!-- Live mode (foreground service) -->
+    <string name="live_title">doormutex · live</string>
+    <string name="live_connected">Connected to the hub</string>
+    <string name="live_waiting">Waiting for the home network</string>
+    <string name="live_problem">The hub does not answer as expected</string>
+    <string name="live_channel">Live mode</string>
+    <string name="live_channel_description">Shown while the widgets are kept live on the home network.</string>
+    <string name="settings_live">Live widgets at home</string>
+    <string name="settings_live_text">Keeps a connection to the hub open while the phone is on Wi-Fi, so the widgets change the moment the light does. Shows a quiet notification. Off: the widgets refresh every 15 minutes.</string>
+
+    <string name="widget_all_name">doormutex – all lights</string>
+    <string name="widget_all_description">Every light: lamp, name, status and until when</string>
 </resources>

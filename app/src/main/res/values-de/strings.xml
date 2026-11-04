@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Status- und Grundtexte wie im Hub und im Plasma-Widget (plasmoid/translate/de.po in padalton/doormutex). -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="status_free">Herein</string>
     <string name="status_working">Ich arbeite</string>
     <string name="status_dnd">Bitte nicht stören</string>
@@ -37,7 +37,7 @@
     <string name="no_profiles">Der Hub zeigt für diesen Token keine Profile.</string>
 
     <string name="pair_title">Mit dem Hub verbinden</string>
-    <string name="pair_intro">Erstelle am Hub einen Token, am besten nur zum Lesen: doormutex-hub token create handy --read-only</string>
+    <string name="pair_intro" tools:ignore="TypographyDashes">Erstelle am Hub einen Token, am besten nur zum Lesen: doormutex-hub token create handy --read-only</string>
     <string name="pair_url">Adresse des Hubs</string>
     <string name="pair_url_hint">https://doormutex.home.example</string>
     <string name="pair_token">Token</string>
@@ -80,4 +80,16 @@
     <string name="widget_not_paired">App öffnen und verbinden</string>
     <string name="widget_pick_profile">Welche Ampel soll dieses Widget zeigen?</string>
     <string name="widget_no_hub">Verbinde zuerst die App mit deinem Hub.</string>
+
+    <string name="live_title">doormutex · live</string>
+    <string name="live_connected">Mit dem Hub verbunden</string>
+    <string name="live_waiting">Warte aufs Heimnetz</string>
+    <string name="live_problem">Der Hub antwortet nicht wie erwartet</string>
+    <string name="live_channel">Live-Modus</string>
+    <string name="live_channel_description">Wird angezeigt, solange die Widgets im Heimnetz live bleiben.</string>
+    <string name="settings_live">Widgets zu Hause live</string>
+    <string name="settings_live_text">Hält eine Verbindung zum Hub offen, solange das Handy im WLAN ist – die Widgets wechseln, sobald die Ampel wechselt. Zeigt eine unauffällige Benachrichtigung. Aus: Die Widgets aktualisieren sich alle 15 Minuten.</string>
+
+    <string name="widget_all_name">doormutex – alle Ampeln</string>
+    <string name="widget_all_description">Alle Ampeln: Lampe, Name, Status und bis wann</string>
 </resources>
