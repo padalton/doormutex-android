@@ -1,0 +1,22 @@
+{
+  "status": "dnd",
+  "phase": "ending_soon",
+  "light": "red_yellow",
+  "reason": "calendar",
+  "detail": "video_call",
+  "since": "2026-10-28T14:00:00+01:00",
+  "until": "2026-10-28T14:30:00+01:00",
+  "next": {
+    "status": "working",
+    "reason": "work_hours",
+    "since": "2026-10-28T14:30:00+01:00",
+    "until": "2026-10-28T17:00:00+01:00"
+  },
+  "next_free": {
+    "start": "2026-10-28T17:00:00+01:00",
+    "end": "2026-10-29T08:00:00+01:00"
+  },
+  "override": null,
+  "pomodoro": null,
+  "updated": "2026-10-28T14:25:03+01:00"
+}

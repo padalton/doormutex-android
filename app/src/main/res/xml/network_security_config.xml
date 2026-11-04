@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cleartext is allowed here because this config cannot express IP ranges.
+     HubUrl.parse() accepts http:// only for private addresses
+     (10/8, 172.16/12, 192.168/16, *.local) and the UI warns first.
+     User-installed CAs are trusted so a home hub can use a private CA. -->
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config
+        cleartextTrafficPermitted="true"
+        tools:ignore="InsecureBaseConfiguration,AcceptsUserCertificates">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status and reason texts match the hub and the Plasma widget (plasmoid/translate in padalton/doormutex). -->
+<resources>
+    <string name="app_name" translatable="false">doormutex</string>
+
+    <string name="status_free">Come in</string>
+    <string name="status_working">Working</string>
+    <string name="status_dnd">Do not disturb</string>
+    <string name="status_away">Not here</string>
+    <string name="status_unknown">Unknown</string>
+    <string name="status_fault">Fault – companion not responding</string>
+
+    <string name="reason_override">set by hand</string>
+    <string name="reason_pomodoro">pomodoro</string>
+    <string name="reason_pomodoro_break">pomodoro break</string>
+    <string name="reason_microphone">microphone in use</string>
+    <string name="reason_camera">camera in use</string>
+    <string name="reason_screen_locked">screen locked</string>
+    <string name="reason_pc_off">PC off</string>
+    <string name="reason_companion_lost">companion not responding</string>
+    <string name="reason_companion_offline">PC not running</string>
+    <string name="reason_calendar">calendar</string>
+    <string name="reason_work_hours">working hours</string>
+    <string name="reason_signal">signal</string>
+    <string name="reason_default">nothing planned</string>
+
+    <string name="until">until %1$s</string>
+    <string name="until_further_notice">until further notice</string>
+    <string name="free_from">free from %1$s</string>
+    <string name="hub_unreachable">Hub not reachable</string>
+    <string name="token_rejected">The hub no longer accepts this token</string>
+    <string name="no_update_since">No update since %1$s</string>
+    <string name="since">since %1$s</string>
+    <string name="blinking">blinking</string>
+    <!-- TalkBack: "Office: Do not disturb, until 17:00" -->
+    <string name="a11y_profile_until">%1$s: %2$s, %3$s</string>
+
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="no_profiles">The hub shows no profiles for this token.</string>
+
+    <!-- Pairing -->
+    <string name="pair_title">Connect to your hub</string>
+    <string name="pair_intro">Create a token on the hub, ideally a read-only one: doormutex-hub token create phone --read-only</string>
+    <string name="pair_url">Hub address</string>
+    <string name="pair_url_hint">https://doormutex.home.example</string>
+    <string name="pair_token">Token</string>
+    <string name="pair_check">Check</string>
+    <string name="pair_save">Use this hub</string>
+    <string name="pair_checking">Asking the hub …</string>
+    <string name="pair_invalid_url">This is not a hub address. Example: https://doormutex.home.example</string>
+    <string name="pair_cleartext_public">Plain http is only allowed for addresses in the home network (192.168.…, 10.…, 172.16–31.…, ….local). Use https.</string>
+    <string name="pair_cleartext_warning">This connection is not encrypted. Everyone in this network can read the token. Only continue if the hub is in your home network.</string>
+    <string name="pair_cleartext_accept">I understand, use http</string>
+    <plurals name="pair_found">
+        <item quantity="one">The hub shows %1$d profile:</item>
+        <item quantity="other">The hub shows %1$d profiles:</item>
+    </plurals>
+    <string name="pair_role_read">Read-only token: this phone can look, not switch.</string>
+    <string name="pair_role_full">Full token: this phone could also switch the light.</string>
+    <string name="pair_role_unknown">This hub does not say whether the token is read-only (hub before API 0.2.0).</string>
+    <string name="pair_error_unreachable">The hub does not answer. Is the phone in the home network and the address correct?</string>
+    <string name="pair_error_unauthorized">The hub does not accept this token.</string>
+    <string name="pair_error_forbidden">The token may not read the profiles.</string>
+    <string name="pair_error_other">Unexpected answer from the hub.</string>
+
+    <!-- Android 17+ local network permission -->
+    <string name="local_network_title">Access to the home network</string>
+    <string name="local_network_text">The hub is a device in your home network. Android asks whether this app may reach such devices; without it the app cannot see the light.</string>
+    <string name="local_network_denied">Without access to the home network the app cannot reach the hub. You can allow it in the app\'s settings under Permissions.</string>
+    <string name="local_network_grant">Allow</string>
+    <string name="local_network_settings">Open app settings</string>
+
+    <!-- Settings -->
+    <string name="settings_hub">Hub</string>
+    <string name="settings_token">Token</string>
+    <string name="settings_token_role">%1$s · %2$s</string>
+    <string name="role_read">read-only</string>
+    <string name="role_full">full access</string>
+    <string name="settings_forget">Disconnect from the hub</string>
+    <string name="settings_forget_text">Removes the hub address and the token from this phone. The token stays valid on the hub until you revoke it there.</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <!-- Widgets -->
+    <string name="widget_single_name">doormutex light</string>
+    <string name="widget_single_description">One light: lamp, status and until when</string>
+    <string name="widget_not_paired">Open the app to connect</string>
+    <string name="widget_pick_profile">Which light should this widget show?</string>
+    <string name="widget_no_hub">Connect the app to your hub first.</string>
+</resources>

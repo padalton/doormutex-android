@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status- und Grundtexte wie im Hub und im Plasma-Widget (plasmoid/translate/de.po in padalton/doormutex). -->
+<resources>
+    <string name="status_free">Herein</string>
+    <string name="status_working">Ich arbeite</string>
+    <string name="status_dnd">Bitte nicht stören</string>
+    <string name="status_away">Nicht da</string>
+    <string name="status_unknown">Unbekannt</string>
+    <string name="status_fault">Störung – Companion antwortet nicht</string>
+
+    <string name="reason_override">von Hand gesetzt</string>
+    <string name="reason_pomodoro">Pomodoro</string>
+    <string name="reason_pomodoro_break">Pomodoro-Pause</string>
+    <string name="reason_microphone">Mikrofon aktiv</string>
+    <string name="reason_camera">Kamera aktiv</string>
+    <string name="reason_screen_locked">Bildschirm gesperrt</string>
+    <string name="reason_pc_off">PC aus</string>
+    <string name="reason_companion_lost">Companion antwortet nicht</string>
+    <string name="reason_companion_offline">PC läuft nicht</string>
+    <string name="reason_calendar">Kalender</string>
+    <string name="reason_work_hours">Arbeitszeit</string>
+    <string name="reason_signal">Signal</string>
+    <string name="reason_default">nichts geplant</string>
+
+    <string name="until">bis %1$s</string>
+    <string name="until_further_notice">bis auf Weiteres</string>
+    <string name="free_from">frei ab %1$s</string>
+    <string name="hub_unreachable">Hub nicht erreichbar</string>
+    <string name="token_rejected">Der Hub akzeptiert diesen Token nicht mehr</string>
+    <string name="no_update_since">Keine Aktualisierung seit %1$s</string>
+    <string name="since">seit %1$s</string>
+    <string name="blinking">blinkt</string>
+    <string name="a11y_profile_until">%1$s: %2$s, %3$s</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="back">Zurück</string>
+    <string name="no_profiles">Der Hub zeigt für diesen Token keine Profile.</string>
+
+    <string name="pair_title">Mit dem Hub verbinden</string>
+    <string name="pair_intro">Erstelle am Hub einen Token, am besten nur zum Lesen: doormutex-hub token create handy --read-only</string>
+    <string name="pair_url">Adresse des Hubs</string>
+    <string name="pair_url_hint">https://doormutex.home.example</string>
+    <string name="pair_token">Token</string>
+    <string name="pair_check">Prüfen</string>
+    <string name="pair_save">Diesen Hub verwenden</string>
+    <string name="pair_checking">Frage den Hub …</string>
+    <string name="pair_invalid_url">Das ist keine Hub-Adresse. Beispiel: https://doormutex.home.example</string>
+    <string name="pair_cleartext_public">Unverschlüsseltes http geht nur für Adressen im Heimnetz (192.168.…, 10.…, 172.16–31.…, ….local). Bitte https verwenden.</string>
+    <string name="pair_cleartext_warning">Diese Verbindung ist nicht verschlüsselt. Alle in diesem Netz können den Token mitlesen. Nur weitermachen, wenn der Hub in deinem Heimnetz steht.</string>
+    <string name="pair_cleartext_accept">Verstanden, http verwenden</string>
+    <plurals name="pair_found">
+        <item quantity="one">Der Hub zeigt %1$d Profil:</item>
+        <item quantity="other">Der Hub zeigt %1$d Profile:</item>
+    </plurals>
+    <string name="pair_role_read">Token nur zum Lesen: Dieses Handy kann schauen, nicht schalten.</string>
+    <string name="pair_role_full">Token mit vollen Rechten: Dieses Handy könnte die Ampel auch schalten.</string>
+    <string name="pair_role_unknown">Dieser Hub sagt nicht, ob der Token nur lesen darf (Hub vor API 0.2.0).</string>
+    <string name="pair_error_unreachable">Der Hub antwortet nicht. Ist das Handy im Heimnetz und stimmt die Adresse?</string>
+    <string name="pair_error_unauthorized">Der Hub akzeptiert diesen Token nicht.</string>
+    <string name="pair_error_forbidden">Der Token darf die Profile nicht lesen.</string>
+    <string name="pair_error_other">Unerwartete Antwort vom Hub.</string>
+
+    <string name="local_network_title">Zugriff aufs Heimnetz</string>
+    <string name="local_network_text">Der Hub ist ein Gerät in deinem Heimnetz. Android fragt, ob diese App solche Geräte erreichen darf – ohne das sieht die App die Ampel nicht.</string>
+    <string name="local_network_denied">Ohne Zugriff aufs Heimnetz erreicht die App den Hub nicht. Du kannst ihn in den App-Einstellungen unter Berechtigungen erlauben.</string>
+    <string name="local_network_grant">Erlauben</string>
+    <string name="local_network_settings">App-Einstellungen öffnen</string>
+
+    <string name="settings_hub">Hub</string>
+    <string name="settings_token">Token</string>
+    <string name="settings_token_role">%1$s · %2$s</string>
+    <string name="role_read">nur lesen</string>
+    <string name="role_full">volle Rechte</string>
+    <string name="settings_forget">Vom Hub trennen</string>
+    <string name="settings_forget_text">Entfernt Adresse und Token von diesem Handy. Am Hub bleibt der Token gültig, bis du ihn dort widerrufst.</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <string name="widget_single_name">doormutex-Ampel</string>
+    <string name="widget_single_description">Eine Ampel: Lampe, Status und bis wann</string>
+    <string name="widget_not_paired">App öffnen und verbinden</string>
+    <string name="widget_pick_profile">Welche Ampel soll dieses Widget zeigen?</string>
+    <string name="widget_no_hub">Verbinde zuerst die App mit deinem Hub.</string>
+</resources>

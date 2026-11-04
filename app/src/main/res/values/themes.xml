@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window theme only; Compose draws everything else (Material 3, dynamic colour). -->
+    <style name="Theme.Doormutex" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

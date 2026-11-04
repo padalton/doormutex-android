@@ -10,3 +10,14 @@ SPDX-License-Identifier = "Apache-2.0"
 path = ["**/*.md"]
 SPDX-FileCopyrightText = "2026 The doormutex contributors"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# Third-party files, unchanged
+[[annotations]]
+path = ["gradlew", "gradlew.bat", "gradle/wrapper/**"]
+SPDX-FileCopyrightText = "Gradle Inc."
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["app/src/main/res/drawable/ic_settings.xml", "app/src/main/res/drawable/ic_back.xml"]
+SPDX-FileCopyrightText = "Google LLC (Material Symbols)"
+SPDX-License-Identifier = "Apache-2.0"
