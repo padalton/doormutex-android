@@ -107,6 +107,9 @@
     <string name="scan_no_camera">Without the camera the app cannot scan the code. Allow it in the app\'s settings, or enter address and token by hand.</string>
     <string name="detail_planned">Next 24 hours</string>
     <string name="detail_nothing_planned">Nothing planned.</string>
+    <string name="detail_calendar_login_expired">Calendar sign-in expired – appointments are missing. Sign in again on the hub.</string>
+    <string name="detail_calendar_not_connected">Calendar not connected – appointments are missing.</string>
+    <string name="detail_calendar_unavailable">Calendar unavailable – appointments may be missing.</string>
     <string name="detail_slot">%1$s – %2$s</string>
     <string name="detail_slot_open">from %1$s</string>
     <string name="detail_eink">E-ink display</string>

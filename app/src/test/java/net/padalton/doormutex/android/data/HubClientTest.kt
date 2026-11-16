@@ -180,5 +180,16 @@ class HubClientTest {
             assertEquals(2, t.slots.size)
             assertEquals(Reason.CALENDAR, t.slots[0].reason)
             assertNull(t.slots[1].until)
+            assertNull(t.calendarProblem)
+        }
+
+    @Test
+    fun `timeline reports an expired calendar sign-in`() =
+        runTest {
+            respond(
+                200,
+                """{"from":"2026-11-04T08:00:00+01:00","to":"2026-11-05T08:00:00+01:00","slots":[],"calendar_problem":"login_expired"}""",
+            )
+            assertEquals(CalendarProblem.LOGIN_EXPIRED, client.timeline(hub, "office").calendarProblem)
         }
 }

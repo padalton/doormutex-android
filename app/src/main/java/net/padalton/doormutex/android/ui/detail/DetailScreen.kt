@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -39,6 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
@@ -54,6 +59,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import net.padalton.doormutex.android.R
 import net.padalton.doormutex.android.app
+import net.padalton.doormutex.android.data.CalendarProblem
 import net.padalton.doormutex.android.data.Freshness
 import net.padalton.doormutex.android.data.HubException
 import net.padalton.doormutex.android.data.LIVE_INTERVAL
@@ -184,6 +190,7 @@ fun DetailScreen(
             item { ProfileCard(profile, stale) }
             item { Switches(profile, readOnly = me?.role == Role.READ, vm) }
             item { Text(stringResource(R.string.detail_planned), style = MaterialTheme.typography.titleMedium) }
+            vm.timeline?.calendarProblem?.let { item { CalendarWarning(it) } }
             val slots = vm.timeline?.slots.orEmpty()
             if (vm.timeline != null && slots.isEmpty()) item { Text(stringResource(R.string.detail_nothing_planned)) }
             items(slots) { SlotRow(it) }
@@ -235,6 +242,33 @@ private fun Switches(
             }
         }
         vm.error?.let { Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
+    }
+}
+
+/** The hub could not read a calendar, so appointments are missing from the plan below. */
+@Composable
+private fun CalendarWarning(problem: CalendarProblem) {
+    val text =
+        stringResource(
+            when (problem) {
+                CalendarProblem.LOGIN_EXPIRED -> R.string.detail_calendar_login_expired
+                CalendarProblem.NOT_CONNECTED -> R.string.detail_calendar_not_connected
+                CalendarProblem.UNAVAILABLE -> R.string.detail_calendar_unavailable
+            },
+        )
+    Card(
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .testTag("calendar-problem")
+                .semantics { liveRegion = LiveRegionMode.Polite },
+    ) {
+        Text(text, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(12.dp))
     }
 }
 
