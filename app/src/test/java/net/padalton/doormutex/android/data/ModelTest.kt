@@ -64,6 +64,31 @@ class ModelTest {
         assertEquals(snapshot, back)
     }
 
+    /** A timeline as the hub sends it; [problem] is the raw JSON value of calendar_problem, or null to leave it out. */
+    private fun timeline(problem: String? = null): Timeline {
+        val field = problem?.let { ""","calendar_problem":$it""" }.orEmpty()
+        val json = """{"from":"2026-11-04T08:00:00+01:00","to":"2026-11-05T08:00:00+01:00","slots":[]$field}"""
+        return HubJson.decodeFromString(Timeline.serializer(), json)
+    }
+
+    @Test
+    fun `timeline without calendar_problem has none`() {
+        assertNull(timeline().calendarProblem)
+        assertNull(timeline("null").calendarProblem)
+    }
+
+    @Test
+    fun `timeline parses every calendar_problem`() {
+        assertEquals(CalendarProblem.LOGIN_EXPIRED, timeline("\"login_expired\"").calendarProblem)
+        assertEquals(CalendarProblem.NOT_CONNECTED, timeline("\"not_connected\"").calendarProblem)
+        assertEquals(CalendarProblem.UNAVAILABLE, timeline("\"unavailable\"").calendarProblem)
+    }
+
+    @Test
+    fun `an unknown calendar_problem counts as unavailable`() {
+        assertEquals(CalendarProblem.UNAVAILABLE, timeline("\"quota_exceeded\"").calendarProblem)
+    }
+
     @Test
     fun `every lamp pattern of the API is known`() {
         val wire = listOf("off", "red", "yellow", "green", "green_blink", "red_yellow", "red_yellow_alternate", "yellow_blink")

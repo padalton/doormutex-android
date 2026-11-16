@@ -135,7 +135,24 @@ data class Timeline(
     @Serializable(with = DateTimeSerializer::class) val from: OffsetDateTime,
     @Serializable(with = DateTimeSerializer::class) val to: OffsetDateTime,
     val slots: List<Slot> = emptyList(),
+    /** Why calendar appointments may be missing from [slots]; null when every calendar is fine (and on older hubs). */
+    @SerialName("calendar_problem") val calendarProblem: CalendarProblem? = null,
 )
+
+/** `calendar_problem` of the timeline; unknown values become [UNAVAILABLE]. */
+@Serializable(with = CalendarProblemSerializer::class)
+enum class CalendarProblem(
+    val wire: String,
+) {
+    /** Google refused the stored sign-in: someone has to sign in again on the hub. */
+    LOGIN_EXPIRED("login_expired"),
+
+    /** A calendar account was never signed in. */
+    NOT_CONNECTED("not_connected"),
+
+    /** Any other read error, e.g. the network. */
+    UNAVAILABLE("unavailable"),
+}
 
 /** Body of `PUT /api/v1/override`; [status] and [mode] as on the wire. */
 @Serializable
@@ -206,5 +223,8 @@ object PhaseSerializer : WireEnumSerializer<Phase>("Phase", Phase.entries, Phase
 object LightSerializer : WireEnumSerializer<Light>("Light", Light.entries, Light.UNKNOWN, { it.wire })
 
 object ReasonSerializer : WireEnumSerializer<Reason>("Reason", Reason.entries, Reason.UNKNOWN, { it.wire })
+
+object CalendarProblemSerializer :
+    WireEnumSerializer<CalendarProblem>("CalendarProblem", CalendarProblem.entries, CalendarProblem.UNAVAILABLE, { it.wire })
 
 object RoleSerializer : WireEnumSerializer<Role>("Role", Role.entries, Role.UNKNOWN, { it.wire })

@@ -99,6 +99,9 @@
     <string name="scan_no_camera">Ohne Kamera kann die App den Code nicht scannen. Erlaube sie in den App-Einstellungen oder gib Adresse und Token von Hand ein.</string>
     <string name="detail_planned">Nächste 24 Stunden</string>
     <string name="detail_nothing_planned">Nichts geplant.</string>
+    <string name="detail_calendar_login_expired">Kalender-Anmeldung abgelaufen – Termine fehlen. Bitte am Hub neu anmelden.</string>
+    <string name="detail_calendar_not_connected">Kalender nicht verbunden – Termine fehlen.</string>
+    <string name="detail_calendar_unavailable">Kalender nicht erreichbar – Termine fehlen möglicherweise.</string>
     <string name="detail_slot">%1$s – %2$s</string>
     <string name="detail_slot_open">ab %1$s</string>
     <string name="detail_eink">E-Ink-Anzeige</string>

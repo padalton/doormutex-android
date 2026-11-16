@@ -34,7 +34,9 @@ what is left is listed below. The hub side
 - Detail screen per profile: the next 24 hours (`/timeline`), the e-ink
   picture (`/eink.png`) and – for full tokens only – the switches Red, Red for
   1 h, Green, Off and Automatic (`PUT`/`DELETE /override`, as the shortcuts in
-  the main repository's `docs/android.md`).
+  the main repository's `docs/android.md`). When the hub cannot read a
+  calendar (`calendar_problem`, e.g. an expired Google sign-in), a warning
+  above the plan says that appointments are missing.
 - Widget "doormutex light" (1×1 up to 2×2), one profile per widget, chosen
   when it is placed and changeable later; tap opens the profile.
 - Widget "doormutex – all lights" (3×2 and up): one row per profile.
